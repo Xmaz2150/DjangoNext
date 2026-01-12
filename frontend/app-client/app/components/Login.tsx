@@ -41,11 +41,11 @@ const Login = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
           <div>
             <label className="block" htmlFor="email">
-              Email
+              Username
             </label>
             <input
               type="text"
-              placeholder="Email"
+              placeholder="Username"
               {...register("email", { required: true })}
               className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
             />
