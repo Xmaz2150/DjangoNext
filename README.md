@@ -2,7 +2,7 @@
 
 Next.js frontend with a Django REST backend, pre-configured to be deployed on Vercel.
 
-## What you get
+## What's inside
 
 - A Next.js App Router frontend in `frontend/app-client/` (TypeScript-friendly)
 - A Django REST backend in `backend/` with DRF and Whitenoise
