@@ -54,6 +54,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',  # CORS support for API access from frontend
     'api',
+    'djoser',
+    'rest_framework_simplejwt.token_blacklist',
+
 ]
 
 MIDDLEWARE = [
@@ -70,11 +73,15 @@ MIDDLEWARE = [
 
 # CORS settings - during development allow the frontend dev server
 # In production you should restrict these via environment variables
-CORS_ALLOW_ALL_ORIGINS = True
-# Alternatively, you can use:
-# CORS_ALLOWED_ORIGINS = [
-#     'http://localhost:3000',
-# ]
+# CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWED_ORIGINS = [ 'http://localhost:3000', ]
+env_allowed_origins = env('CORS_ALLOWED_ORIGINS', default='')
+
+if env_allowed_origins:
+    CORS_ALLOWED_ORIGINS += [origin for origin in env_allowed_origins.split(',') if origin]
+
+
 
 ROOT_URLCONF = 'core.urls'
 
@@ -160,5 +167,28 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
+
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+DJOSER = {
+    "PASSWORD_RESET_CONFIRM_URL": "auth/password/reset-password-confirmation/?uid={uid}&token={token}",
+    "ACTIVATION_URL": "#/activate/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL": False,
+    "SERIALIZERS": {},
+}
+
+SITE_NAME = "DjangoNextB"
+
+DOMAIN = 'localhost:3000'
 
 print("Remote DB:", remote)
