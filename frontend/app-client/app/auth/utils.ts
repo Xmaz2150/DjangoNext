@@ -71,6 +71,39 @@ const resetPasswordConfirm = (
   );
 };
 
+const activateUser = (uid: string, token: string) => {
+  return api.post({ uid, token }, "/auth/users/activation/");
+};
+
+const resendActivation = (email: string) => {
+  return api.post({ email }, "/auth/users/resend_activation/");
+};
+
+const changePassword = (
+  current_password: string,
+  new_password: string,
+  re_new_password: string,
+  accessToken: string
+) => {
+  return api
+    .auth(`Bearer ${accessToken}`)
+    .post(
+      { current_password, new_password, re_new_password },
+      "/auth/users/set_password/"
+    );
+};
+
+const updateProfile = (
+  data: { username?: string; email?: string },
+  accessToken: string
+) => {
+  return api.auth(`Bearer ${accessToken}`).patch(data, "/auth/users/me/");
+};
+
+const getMe = (accessToken: string) => {
+  return api.auth(`Bearer ${accessToken}`).get("/auth/users/me/");
+};
+
 export const AuthActions = () => {
   return {
     login,
@@ -79,5 +112,10 @@ export const AuthActions = () => {
     register,
     resetPassword,
     logout,
+    activateUser,
+    resendActivation,
+    changePassword,
+    updateProfile,
+    getMe,
   };
 };

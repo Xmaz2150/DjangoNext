@@ -11,6 +11,8 @@ export function middleware(request: NextRequest) {
     "/auth/register",
     "/auth/password/reset-password",
     "/auth/password/reset-password-confirmation",
+    "/auth/activate",
+    "/auth/resend-activation",
     "/demo",
     "/demo/cookies",
     "/demo/api-test",
