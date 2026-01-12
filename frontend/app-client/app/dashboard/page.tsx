@@ -1,29 +1,42 @@
 "use client";
 
+import { useState } from "react";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import { AuthActions } from "@/app/auth/utils";
+import { removeTokens, getTokens } from "@/app/auth/actions";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const { data: user } = useSWR("/auth/users/me", fetcher);
+  const { data: user, isLoading } = useSWR("/auth/users/me", fetcher);
 
-  const { logout, removeTokens } = AuthActions();
+  const { logout } = AuthActions();
 
-  const handleLogout = () => {
-    logout()
-      .res(() => {
-        removeTokens();
-
-        router.push("/auth/login");
-      })
-      .catch(() => {
-        removeTokens();
-        router.push("/auth/login");
-      });
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      const { refreshToken } = await getTokens();
+      if (refreshToken) {
+        await logout(refreshToken).res();
+      }
+    } catch {
+      // Continue with logout even if API call fails
+    } finally {
+      await removeTokens();
+      router.push("/auth/login");
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
@@ -36,9 +49,10 @@ export default function Home() {
         </ul>
         <button
           onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+          disabled={isLoggingOut}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Disconnect
+          {isLoggingOut ? "Logging out..." : "Disconnect"}
         </button>
       </div>
     </div>

@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { AuthActions } from "@/app/auth/utils";
+import { AuthActions, getErrorMessage } from "@/app/auth/utils";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type FormData = {
   email: string;
@@ -10,6 +11,9 @@ type FormData = {
 };
 
 const Register = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  
   const {
     register,
     handleSubmit,
@@ -19,19 +23,25 @@ const Register = () => {
 
   const router = useRouter();
 
-  const { register: registerUser } = AuthActions(); // Note: Renamed to avoid naming conflict with useForm's register
+  const { register: registerUser } = AuthActions();
 
-  const onSubmit = (data: FormData) => {
-    registerUser(data.email, data.username, data.password)
-      .json(() => {
-        router.push("/");
-      })
-      .catch((err) => {
-        setError("root", {
-          type: "manual",
-          message: err.json.detail,
-        });
+  const onSubmit = async (data: FormData) => {
+    setIsLoading(true);
+    setSuccessMessage("");
+    try {
+      await registerUser(data.email, data.username, data.password).res();
+      setSuccessMessage("Account created successfully! Redirecting to login...");
+      setTimeout(() => {
+        router.push("/auth/login");
+      }, 2000);
+    } catch (err) {
+      setError("root", {
+        type: "manual",
+        message: getErrorMessage(err),
       });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -44,10 +54,11 @@ const Register = () => {
               Email
             </label>
             <input
-              type="text"
+              type="email"
               placeholder="Email"
               {...register("email", { required: "Email is required" })}
               className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+              disabled={isLoading}
             />
             {errors.email && (
               <span className="text-xs text-red-600">
@@ -64,6 +75,7 @@ const Register = () => {
               placeholder="Username"
               {...register("username", { required: "Username is required" })}
               className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+              disabled={isLoading}
             />
             {errors.username && (
               <span className="text-xs text-red-600">
@@ -80,6 +92,7 @@ const Register = () => {
               placeholder="Password"
               {...register("password", { required: "Password is required" })}
               className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+              disabled={isLoading}
             />
             {errors.password && (
               <span className="text-xs text-red-600">
@@ -88,14 +101,32 @@ const Register = () => {
             )}
           </div>
           <div className="flex items-center justify-between mt-4">
-            <button className="px-12 py-2 leading-5 text-white transition-colors duration-200 transform bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:bg-blue-700">
-              Register
+            <button 
+              disabled={isLoading}
+              className="px-12 py-2 leading-5 text-white transition-colors duration-200 transform bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? "Creating account..." : "Register"}
             </button>
           </div>
+          {successMessage && (
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
+              <span className="text-sm text-green-600">{successMessage}</span>
+            </div>
+          )}
           {errors.root && (
-            <span className="text-xs text-red-600">{errors.root.message}</span>
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+              <span className="text-sm text-red-600">{errors.root.message}</span>
+            </div>
           )}
         </form>
+        <div className="mt-6 text-center">
+          <Link
+            href="/auth/login"
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Already have an account? Login
+          </Link>
+        </div>
       </div>
     </div>
   );
