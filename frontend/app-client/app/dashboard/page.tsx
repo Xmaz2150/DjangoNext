@@ -1,44 +1,75 @@
 "use client";
 
+import { useState } from "react";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import { AuthActions } from "@/app/auth/utils";
+import { removeTokens, getTokens } from "@/app/auth/actions";
 import { useRouter } from "next/navigation";
+import Loading from "@/app/components/Loading";
+
+interface User {
+  username: string;
+  email: string;
+}
 
 export default function Home() {
   const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const { data: user } = useSWR("/auth/users/me", fetcher);
+  const { data: user, isLoading } = useSWR("/auth/users/me", fetcher<User>);
 
-  const { logout, removeTokens } = AuthActions();
+  const { logout } = AuthActions();
 
-  const handleLogout = () => {
-    logout()
-      .res(() => {
-        removeTokens();
-
-        router.push("/auth/login");
-      })
-      .catch(() => {
-        removeTokens();
-        router.push("/auth/login");
-      });
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      const { refreshToken } = await getTokens();
+      if (refreshToken) {
+        await logout(refreshToken).res();
+      }
+    } catch {
+      // Continue with logout even if API call fails
+    } finally {
+      await removeTokens();
+      router.push("/auth/login");
+    }
   };
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-1/3 text-center">
-        <h1 className="text-2xl font-bold mb-4">Hi, {user?.username}!</h1>
-        <p className="mb-4">Your account details:</p>
-        <ul className="mb-4">
-          <li>Username: {user?.username}</li>
-          <li>Email: {user?.email}</li>
-        </ul>
+    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-zinc-900">
+        <h1 className="mb-2 text-center text-3xl font-semibold tracking-tight text-black dark:text-zinc-50">
+          Welcome back, {user?.username}!
+        </h1>
+        <p className="mb-8 text-center text-zinc-600 dark:text-zinc-400">
+          {user?.email}
+        </p>
+
+        <div className="mb-6 rounded-md bg-zinc-100 p-4 dark:bg-zinc-800">
+          <h2 className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Account Details
+          </h2>
+          <div className="space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
+            <p>
+              <span className="font-medium">Username:</span> {user?.username}
+            </p>
+            <p>
+              <span className="font-medium">Email:</span> {user?.email}
+            </p>
+          </div>
+        </div>
+
         <button
           onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+          disabled={isLoggingOut}
+          className="w-full rounded-md bg-red-600 px-4 py-2 font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Disconnect
+          {isLoggingOut ? "Logging out..." : "Logout"}
         </button>
       </div>
     </div>

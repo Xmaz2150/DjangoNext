@@ -1,5 +1,4 @@
 import wretch from "wretch";
-import { getCookie, getCookies, setCookie, deleteCookie, hasCookie } from 'cookies-next/client';
 
 import { API_BASE_URL } from "@/lib/api";
 
@@ -7,46 +6,52 @@ import { API_BASE_URL } from "@/lib/api";
 const api = wretch(API_BASE_URL).accept("application/json");
 
 /**
- * Stores a token in cookies.
- * @param {string} token - The token to be stored.
- * @param {"access" | "refresh"} type - The type of the token (access or refresh).
+ * Helper function to safely extract error messages from wretch errors.
+ * Handles various error response formats.
  */
-const storeToken = (token: string, type: "access" | "refresh") => {
-  setCookie(type + "Token", token);
-};
+export const getErrorMessage = (err: unknown): string => {
+  // Handle wretch errors with JSON response
+  if (err && typeof err === "object" && "json" in err) {
+    const errorJson = (err as { json: unknown }).json;
+    if (errorJson && typeof errorJson === "object") {
+      // Check common error response patterns
+      if ("detail" in errorJson && typeof errorJson.detail === "string") {
+        return errorJson.detail;
+      }
+      if ("message" in errorJson && typeof errorJson.message === "string") {
+        return errorJson.message;
+      }
+      // Handle field-specific errors (e.g., {"email": ["This field is required"]})
+      const firstFieldError = Object.values(errorJson).find(
+        (val) => Array.isArray(val) && val.length > 0
+      );
+      if (firstFieldError && Array.isArray(firstFieldError)) {
+        return firstFieldError[0];
+      }
+    }
+  }
 
-/**
- * Retrieves a token from cookies.
- * @param {"access" | "refresh"} type - The type of the token to retrieve (access or refresh).
- * @returns {string | undefined} The token, if found.
- */
-const getToken = (type: string) => {
-  return getCookie(type + "Token");
-};
+  // Handle standard Error objects
+  if (err instanceof Error) {
+    return err.message;
+  }
 
-/**
- * Removes both access and refresh tokens from cookies.
- */
-const removeTokens = () => {
-  deleteCookie("accessToken");
-  deleteCookie("refreshToken");
+  return "An unexpected error occurred. Please try again.";
 };
 
 const register = (email: string, username: string, password: string) => {
   return api.post({ email, username, password }, "/auth/users/");
 };
 
-const login = (email: string, password: string) => {
-  return api.post({ username: email, password }, "/auth/jwt/create");
+const login = (username: string, password: string) => {
+  return api.post({ username, password }, "/auth/jwt/create");
 };
 
-const logout = () => {
-  const refreshToken = getToken("refresh");
+const logout = (refreshToken: string) => {
   return api.post({ refresh: refreshToken }, "/auth/logout/");
 };
 
-const handleJWTRefresh = () => {
-  const refreshToken = getToken("refresh");
+const handleJWTRefresh = (refreshToken: string) => {
   return api.post({ refresh: refreshToken }, "/auth/jwt/refresh");
 };
 
@@ -73,9 +78,6 @@ export const AuthActions = () => {
     handleJWTRefresh,
     register,
     resetPassword,
-    storeToken,
-    getToken,
     logout,
-    removeTokens,
   };
 };
