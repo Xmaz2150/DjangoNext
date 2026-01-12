@@ -27,10 +27,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-j!7mj7np1-a=0=k=x8491@fpg+l76ry-!ss*yy0m#gx8umh7^6'
+SECRET_KEY = env('SECRET_KEY', default='django-insecure-j!7mj7np1-a=0=k=x8491@fpg+l76ry-!ss*yy0m#gx8umh7^6')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG', default=True)
 
 # default allowed hosts
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
@@ -178,12 +178,25 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# Email Configuration - Brevo (Sendinblue) SMTP
+# Set USE_CONSOLE_EMAIL=True in .env for development to print emails to console
+if env.bool('USE_CONSOLE_EMAIL', default=True):
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = "smtp-relay.brevo.com"
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = env('BREVO_SMTP_USER', default='')
+    EMAIL_HOST_PASSWORD = env('BREVO_SMTP_PASSWORD', default='')
+
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='noreply@localhost')
 
 DJOSER = {
     "PASSWORD_RESET_CONFIRM_URL": "auth/password/reset-password-confirmation/?uid={uid}&token={token}",
-    "ACTIVATION_URL": "#/activate/{uid}/{token}",
-    "SEND_ACTIVATION_EMAIL": False,
+    "ACTIVATION_URL": "auth/activate/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL": True,
+    "SEND_CONFIRMATION_EMAIL": True,
     "SERIALIZERS": {},
 }
 
