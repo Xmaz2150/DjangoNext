@@ -36,50 +36,57 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="px-8 py-6 mt-4 text-left bg-white shadow-lg w-1/3">
-        <h3 className="text-2xl font-semibold">Reset Password</h3>
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
-          <label className="block" htmlFor="email">
-            Email
-          </label>
-          <input
-            type="email"
-            placeholder="Enter your email"
-            {...register("email", { required: "Email is required" })}
-            className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
-            disabled={isLoading}
-          />
-          {errors.email && (
-            <span className="text-xs text-red-600">{errors.email.message}</span>
-          )}
-          <div className="flex items-center justify-between mt-4">
-            <button
+    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-zinc-900">
+        <h1 className="mb-2 text-center text-3xl font-semibold tracking-tight text-black dark:text-zinc-50">
+          Reset Password
+        </h1>
+        <p className="mb-8 text-center text-zinc-600 dark:text-zinc-400">
+          Enter your email to receive a reset link
+        </p>
+        
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              Email
+            </label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              {...register("email", { required: "Email is required" })}
+              className="w-full rounded-md border border-zinc-300 bg-white px-4 py-2 text-black focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
               disabled={isLoading}
-              className="px-12 py-2 leading-5 text-white transition-colors duration-200 transform bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "Sending..." : "Send Reset Email"}
-            </button>
+            />
+            {errors.email && (
+              <span className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.email.message}</span>
+            )}
           </div>
+          
+          <button
+            disabled={isLoading}
+            className="mt-4 w-full rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isLoading ? "Sending..." : "Send Reset Email"}
+          </button>
+          
           {successMessage && (
-            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
-              <span className="text-sm text-green-600">{successMessage}</span>
+            <div className="rounded-md bg-green-50 p-3 text-sm text-green-600 dark:bg-green-900/20 dark:text-green-400">
+              {successMessage}
             </div>
           )}
           {errors.root && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
-              <span className="text-sm text-red-600">{errors.root.message}</span>
+            <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
+              {errors.root.message}
             </div>
           )}
         </form>
-        <div className="mt-6 text-center">
-          <Link
-            href="/auth/login"
-            className="text-sm text-blue-600 hover:underline"
-          >
-            Back to Login
+        
+        <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
+          Remember your password?{" "}
+          <Link href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
+            Sign in
           </Link>
-        </div>
+        </p>
       </div>
     </div>
   );

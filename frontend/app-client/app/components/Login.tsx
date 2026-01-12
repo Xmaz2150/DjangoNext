@@ -47,70 +47,76 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="px-8 py-6 mt-4 text-left bg-white shadow-lg w-1/3">
-        <h3 className="text-2xl font-semibold">Login to your account</h3>
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
+    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-zinc-900">
+        <h1 className="mb-2 text-center text-3xl font-semibold tracking-tight text-black dark:text-zinc-50">
+          Welcome Back
+        </h1>
+        <p className="mb-8 text-center text-zinc-600 dark:text-zinc-400">
+          Sign in to your account
+        </p>
+        
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div>
-            <label className="block" htmlFor="username">
+            <label className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Username
             </label>
             <input
               type="text"
-              placeholder="Username"
+              placeholder="Enter your username"
               {...register("username", { required: "Username is required" })}
-              className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+              className="w-full rounded-md border border-zinc-300 bg-white px-4 py-2 text-black focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
               disabled={isLoading}
             />
             {errors.username && (
-              <span className="text-xs text-red-600">{errors.username.message}</span>
+              <span className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.username.message}</span>
             )}
           </div>
-          <div className="mt-4">
-            <label className="block" htmlFor="password">
+          
+          <div>
+            <label className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Password
             </label>
             <input
               type="password"
-              placeholder="Password"
+              placeholder="••••••••"
               {...register("password", { required: "Password is required" })}
-              className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-600"
+              className="w-full rounded-md border border-zinc-300 bg-white px-4 py-2 text-black focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
               disabled={isLoading}
             />
             {errors.password && (
-              <span className="text-xs text-red-600">{errors.password.message}</span>
+              <span className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.password.message}</span>
             )}
           </div>
-          <div className="flex items-center justify-between mt-4">
-            <button 
-              disabled={isLoading}
-              className="px-12 py-2 leading-5 text-white transition-colors duration-200 transform bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "Signing in..." : "Login"}
-            </button>
-          </div>
+          
+          <button 
+            disabled={isLoading}
+            className="mt-4 w-full rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isLoading ? "Signing in..." : "Sign In"}
+          </button>
+          
           {errors.root && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
-              <span className="text-sm text-red-600">{errors.root.message}</span>
+            <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
+              {errors.root.message}
             </div>
           )}
         </form>
+        
         <div className="mt-6 text-center">
           <Link
             href="/auth/password/reset-password"
-            className="text-sm text-blue-600 hover:underline"
+            className="text-sm text-blue-600 hover:text-blue-500"
           >
             Forgot password?
           </Link>
         </div>
-        <div className="mt-2 text-center">
-          <Link
-            href="/auth/register"
-            className="text-sm text-blue-600 hover:underline"
-          >
-            Don&apos;t have an account? Register
+        <p className="mt-4 text-center text-sm text-zinc-600 dark:text-zinc-400">
+          Don&apos;t have an account?{" "}
+          <Link href="/auth/register" className="font-medium text-blue-600 hover:text-blue-500">
+            Sign up
           </Link>
-        </div>
+        </p>
       </div>
     </div>
   );

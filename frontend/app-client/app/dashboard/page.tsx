@@ -37,27 +37,45 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+      <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+          <p className="text-zinc-600 dark:text-zinc-400">Loading...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-1/3 text-center">
-        <h1 className="text-2xl font-bold mb-4">Hi, {user?.username}!</h1>
-        <p className="mb-4">Your account details:</p>
-        <ul className="mb-4">
-          <li>Username: {user?.username}</li>
-          <li>Email: {user?.email}</li>
-        </ul>
+    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-zinc-900">
+        <h1 className="mb-2 text-center text-3xl font-semibold tracking-tight text-black dark:text-zinc-50">
+          Welcome back, {user?.username}!
+        </h1>
+        <p className="mb-8 text-center text-zinc-600 dark:text-zinc-400">
+          {user?.email}
+        </p>
+
+        <div className="mb-6 rounded-md bg-zinc-100 p-4 dark:bg-zinc-800">
+          <h2 className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Account Details
+          </h2>
+          <div className="space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
+            <p>
+              <span className="font-medium">Username:</span> {user?.username}
+            </p>
+            <p>
+              <span className="font-medium">Email:</span> {user?.email}
+            </p>
+          </div>
+        </div>
+
         <button
           onClick={handleLogout}
           disabled={isLoggingOut}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full rounded-md bg-red-600 px-4 py-2 font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isLoggingOut ? "Logging out..." : "Disconnect"}
+          {isLoggingOut ? "Logging out..." : "Logout"}
         </button>
       </div>
     </div>
