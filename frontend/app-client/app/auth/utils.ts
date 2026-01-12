@@ -1,8 +1,10 @@
 import wretch from "wretch";
 import { getCookie, getCookies, setCookie, deleteCookie, hasCookie } from 'cookies-next/client';
 
+import { API_BASE_URL } from "@/lib/api";
+
 // Base API setup for making HTTP requests
-const api = wretch("http://localhost:8000").accept("application/json");
+const api = wretch(API_BASE_URL).accept("application/json");
 
 /**
  * Stores a token in cookies.
