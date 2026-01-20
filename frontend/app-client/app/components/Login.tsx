@@ -108,7 +108,7 @@ const Login = () => {
             href="/auth/password/reset-password"
             className="text-sm text-zinc-400 dark:text-zinc-500"
           >
-            Forgot password? (Coming soon)
+            Forgot password?
           </Link>
         </div>
         <p className="mt-4 text-center text-sm text-zinc-600 dark:text-zinc-400">
