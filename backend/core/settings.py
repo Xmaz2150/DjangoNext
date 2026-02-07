@@ -27,10 +27,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-j!7mj7np1-a=0=k=x8491@fpg+l76ry-!ss*yy0m#gx8umh7^6'
+SECRET_KEY = env('SECRET_KEY', default='django-insecure-j!7mj7np1-a=0=k=x8491@fpg+l76ry-!ss*yy0m#gx8umh7^6')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG', default=True)
 
 # default allowed hosts
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
@@ -54,6 +54,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',  # CORS support for API access from frontend
     'api',
+    'djoser',
+    'rest_framework_simplejwt.token_blacklist',
+
 ]
 
 MIDDLEWARE = [
@@ -70,11 +73,15 @@ MIDDLEWARE = [
 
 # CORS settings - during development allow the frontend dev server
 # In production you should restrict these via environment variables
-CORS_ALLOW_ALL_ORIGINS = True
-# Alternatively, you can use:
-# CORS_ALLOWED_ORIGINS = [
-#     'http://localhost:3000',
-# ]
+# CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWED_ORIGINS = [ 'http://localhost:3000', ]
+env_allowed_origins = env('CORS_ALLOWED_ORIGINS', default='')
+
+if env_allowed_origins:
+    CORS_ALLOWED_ORIGINS += [origin for origin in env_allowed_origins.split(',') if origin]
+
+
 
 ROOT_URLCONF = 'core.urls'
 
@@ -160,5 +167,42 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
+
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
+# Email Configuration - Brevo (Sendinblue) SMTP
+# Set USE_CONSOLE_EMAIL=True in .env for development to print emails to console
+# Commented out for now - email not working
+if env.bool('USE_CONSOLE_EMAIL', default=True):
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = env('EMAIL_HOST', default='')
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
+    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+
+# DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='noreply@localhost')
+
+DJOSER = {
+    "PASSWORD_RESET_CONFIRM_URL": "auth/password/reset-password-confirmation/?uid={uid}&token={token}",
+    "ACTIVATION_URL": "auth/activate/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL": True,
+    "SEND_CONFIRMATION_EMAIL": True,
+    "SERIALIZERS": {},
+}
+
+SITE_NAME = env("SITE_NAME", default="DjangoNext")
+
+DOMAIN = env('FRONTEND_EMAIL_VERIFICATION_DOMAIN', default='localhost:3000')  # Frontend domain for email links
 
 print("Remote DB:", remote)
