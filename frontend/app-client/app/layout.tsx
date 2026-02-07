@@ -13,24 +13,24 @@ const geistMono = Geist_Mono({
 });
 
 export const viewport: Viewport = {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    themeColor: "#220eda",
-}
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#7C3AED",
+};
 
 export const metadata: Metadata = {
-  title: "DjangoNext",
-  description: "DjangoNext Progressive Web App",
+  title: "DjNext",
+  description: "A modern Django and Next.js powered application",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "DjangoNext",
+    title: "DjNext",
   },
   icons: {
-    icon: "/icons/icon-192x192.png",
-    apple: "/icons/icon-192x192.png",
+    icon: "/icon-192x192.png",
+    apple: "/icon-192x192.png",
   },
 };
 
